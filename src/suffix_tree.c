@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <malloc.h>
+#include <stdbool.h>
 #include "suffix_tree.h"
 
 /*
@@ -17,7 +18,7 @@ int follow_edge(struct Range r, int current_matched_chars, const char *suffix, c
 }
 
 // Splits an edge in the suffix tree
-void split_edge(struct SuffixTree *st, int suffix_len, int str_len, struct SuffixTreeNode *subtree, int matched_characters, int matches) {
+int split_edge(struct SuffixTree *st, int suffix_len, int str_len, struct SuffixTreeNode *subtree, int matched_characters, int matches) {
     st->st_pool->next++;
     struct SuffixTreeNode *fst_child = st->st_pool->next;
     fst_child->range.start = str_len-suffix_len+matched_characters;
@@ -44,6 +45,7 @@ void split_edge(struct SuffixTree *st, int suffix_len, int str_len, struct Suffi
     subtree->child = fst_child;
     subtree->range.end = subtree->range.start+matches;
     subtree->leaf_label = -1;
+    return 1;
 }
 
 void insert_node(struct SuffixTree *st, char *suffix, int suffix_len, char *str, int str_len) {
@@ -91,8 +93,8 @@ void insert_node(struct SuffixTree *st, char *suffix, int suffix_len, char *str,
     // Here we assume, that place_to_insert has been set correctly
     st->st_pool->next++;
     struct SuffixTreeNode *new_node = st->st_pool->next;
-    new_node->range.start = str_len-suffix_len;
-    new_node->range.end = str_len-matched_characters;
+    new_node->range.start = str_len-suffix_len+matched_characters;
+    new_node->range.end = str_len;
     new_node->leaf_label = str_len-suffix_len;
 
     new_node->parent = place_to_insert;
@@ -130,7 +132,7 @@ struct SuffixTree *construct_st(char *str) {
 
 // I think range_of_string will only be used in testing?
 char *range_of_string(struct Range r, char *str) {
-    int len = r.end-r.start;
+    int len = r.end-r.start+(r.end-r.start < 0);
     char *new_str = malloc(len+1);
     memcpy(new_str, str+r.start, len);
     new_str[len] = '\0';
