@@ -8,6 +8,8 @@ int magic_number = 80000000;
 struct Fasta {
     char* fasta_head;
     char* fasta_sequence;
+    struct SuffixTree *fasta_sequence_st;
+    int fasta_sequence_len;
 };
 
 char *read_fasta_head(char **strptr) {
@@ -70,6 +72,8 @@ struct Fasta **parse_fasta(char *fasta_str) {
         struct Fasta *f = malloc(sizeof(struct Fasta));
         f->fasta_head = header;
         f->fasta_sequence = sequence;
+        f->fasta_sequence_st = construct_st(sequence);
+        f->fasta_sequence_len = (int) strlen(sequence);
         fastas[i] = f;
         i++;
     }

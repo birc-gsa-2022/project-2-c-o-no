@@ -92,7 +92,7 @@ MU_TEST(test_atataa_constr) {
 }
 
 
-MU_TEST(test_naive_insert_1) {
+MU_TEST(test_naive_insert_ATATAA) {
     char *str = "ATATAA";
 
     // Subroutine of construction:
@@ -254,6 +254,413 @@ MU_TEST(test_naive_insert_1) {
 
 }
 
+MU_TEST(test_naive_insert_mississippi) {
+    char *str = "mississippi";
+
+    // Subroutine of construction:
+    int n = (int) strlen(str);
+    int num_of_nodes = n == 1 ? 2 : (2*n+1);
+    struct SuffixTree *st = malloc(sizeof *st);
+    struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
+    struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes*sizeof(struct SuffixTreeNode));
+    st_pool->nodes = pool_nodes;
+    st_pool->next = pool_nodes;
+
+    st->st_pool = st_pool;
+    st->root = st->st_pool->next;
+    st->root->range.start = 0;
+    st->root->range.end = 0;
+    st->root->leaf_label = -1;
+    st->root->child = NULL;
+
+    char *suffix1 = "mississippi";
+    insert_node(st, suffix1, (int) strlen(suffix1), str, (int) strlen(str));
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(0, st->root->child->leaf_label);
+
+    char *suffix2 = "ississippi";
+    insert_node(st, suffix2, (int) strlen(suffix2), str, (int) strlen(str));
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ississippi", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(1, st->root->child->leaf_label);
+
+    char *suffix3 = "ssissippi";
+    insert_node(st, suffix3, (int) strlen(suffix3), str, (int) strlen(str));
+
+    mu_assert_string_eq("ssissippi", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(2, st->root->child->leaf_label);
+
+    mu_assert_string_eq("ississippi", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->leaf_label);
+
+    char *suffix4 = "sissippi";
+    insert_node(st, suffix4, (int) strlen(suffix4), str, (int) strlen(str));
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("issippi", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(3, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("sissippi", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ississippi", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->leaf_label);
+
+    char *suffix5 = "issippi";
+    insert_node(st, suffix5, (int) strlen(suffix5), str, (int) strlen(str));
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("issippi", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(3, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("sissippi", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("issi", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->sibling->leaf_label);
+
+    char *suffix6 = "ssippi";
+    insert_node(st, suffix6, (int) strlen(suffix6), str, (int) strlen(str));
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("issippi", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(3, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("issi", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->sibling->leaf_label);
+
+    char *suffix7 = "sippi";
+    insert_node(st, suffix7, (int) strlen(suffix7), str, (int) strlen(str));
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->child->child->range, str));
+    mu_assert_int_eq(6, st->root->child->child->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->child->child->sibling->range, str));
+    mu_assert_int_eq(3, st->root->child->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("issi", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->sibling->leaf_label);
+
+    char *suffix8 = "ippi";
+    insert_node(st, suffix8, (int) strlen(suffix8), str, (int) strlen(str));
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->child->child->range, str));
+    mu_assert_int_eq(6, st->root->child->child->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->child->child->sibling->range, str));
+    mu_assert_int_eq(3, st->root->child->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssi", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->sibling->child->sibling->leaf_label);
+
+    char *suffix9 = "ppi";
+    insert_node(st, suffix9, (int) strlen(suffix9), str, (int) strlen(str));
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(8, st->root->child->leaf_label);
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->child->range, str));
+    mu_assert_int_eq(6, st->root->child->sibling->child->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->child->sibling->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssi", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->child->sibling->child->sibling->leaf_label);
+
+    char *suffix10 = "pi";
+    insert_node(st, suffix10, (int) strlen(suffix10), str, (int) strlen(str));
+
+    mu_assert_string_eq("p", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(9, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("pi", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(8, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->child->range, str));
+    mu_assert_int_eq(6, st->root->child->sibling->child->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->child->sibling->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssi", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->child->sibling->child->sibling->leaf_label);
+
+    char *suffix11 = "i";
+    insert_node(st, suffix11, (int) strlen(suffix11), str, (int) strlen(str));
+
+    mu_assert_string_eq("p", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(9, st->root->child->child->leaf_label);
+
+    mu_assert_string_eq("pi", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(8, st->root->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(10, st->root->child->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->child->sibling->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ssi", range_of_string(st->root->child->sibling->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->sibling->child->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->sibling->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->child->sibling->sibling->child->sibling->leaf_label);
+
+    char *suffix12 = "";
+    insert_node(st, suffix12, (int) strlen(suffix12), str, (int) strlen(str));
+
+    mu_assert_string_eq("", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(11, st->root->child->leaf_label);
+
+    mu_assert_string_eq("p", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(9, st->root->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("pi", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(8, st->root->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("s", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->sibling->sibling->child->range, str));
+    mu_assert_int_eq(10, st->root->child->sibling->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->sibling->child->child->sibling->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->sibling->child->child->sibling->leaf_label);
+
+    mu_assert_string_eq("si", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(5, st->root->child->sibling->sibling->child->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->sibling->child->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("mississippi", range_of_string(st->root->child->sibling->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("i", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(7, st->root->child->sibling->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("ssi", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->sibling->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("ppi", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->sibling->sibling->child->sibling->sibling->child->leaf_label);
+
+    mu_assert_string_eq("ssippi", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->sibling->child->sibling->sibling->child->sibling->leaf_label);
+
+}
+
+
+
 MU_TEST(test_range_1) {
     struct Range range;
     range.start = 3;
@@ -297,7 +704,8 @@ void run_all_tests() {
     MU_RUN_TEST(test_range_1);
     MU_RUN_TEST(test_range_2);
     MU_RUN_TEST(test_range_3);
-    MU_RUN_TEST(test_naive_insert_1);
+    MU_RUN_TEST(test_naive_insert_ATATAA);
+    MU_RUN_TEST(test_naive_insert_mississippi);
     MU_RUN_TEST(test_atataa_constr);
 }
 

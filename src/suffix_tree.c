@@ -5,15 +5,45 @@
 
 /*
  * Follows an edge (Range r)
- * Takes an integer current_matched_chars and returns the addition of characters on the edge
+ * Takes an integer current_matched_chars and returns newly matched characters on the given edge
  */
 int follow_edge(struct Range r, int current_matched_chars, const char *suffix, const char *str) {
-    for (int i = current_matched_chars; i < r.end; i++) {
+    int i;
+    for (i = 0; i+r.start < r.end; i++) {
         // Break as soon we can't match any more on the edge
-        if (suffix[i] != str[r.start+i]) break;
-        current_matched_chars++;
+        if (suffix[current_matched_chars+i] != str[r.start+i]) break;
     }
-    return current_matched_chars;
+    return i;
+}
+
+// Splits an edge in the suffix tree
+void split_edge(struct SuffixTree *st, int suffix_len, int str_len, struct SuffixTreeNode *subtree, int matched_characters, int matches) {
+    st->st_pool->next++;
+    struct SuffixTreeNode *fst_child = st->st_pool->next;
+    fst_child->range.start = str_len-suffix_len+matched_characters;
+    fst_child->range.end = str_len;
+    fst_child->leaf_label = str_len-suffix_len;
+    fst_child->parent = subtree;
+
+    st->st_pool->next++;
+    struct SuffixTreeNode *snd_child = st->st_pool->next;
+    fst_child->sibling = snd_child;
+
+    snd_child->parent = subtree;
+    snd_child->child = subtree->child;
+    snd_child->leaf_label = subtree->leaf_label;
+    /*
+     * We only want to add 'matches' to range.start and not matched_characters
+     * This is because 'matches' only go from range.start
+     * (in contrast to matched_characters, which is all the way from the root)
+     */
+    snd_child->range.start = subtree->range.start+matches;
+    snd_child->range.end = subtree->range.end;
+
+    // Now as the split has been created, we have to clean up the edge from the subtree to the subtree parent
+    subtree->child = fst_child;
+    subtree->range.end = subtree->range.start+matches;
+    subtree->leaf_label = -1;
 }
 
 void insert_node(struct SuffixTree *st, char *suffix, int suffix_len, char *str, int str_len) {
@@ -31,52 +61,29 @@ void insert_node(struct SuffixTree *st, char *suffix, int suffix_len, char *str,
         if (matched_characters == suffix_len) break;
 
         // Check if the edge is matching characters in the suffix
-        matched_characters = follow_edge(child->range, matched_characters, suffix, str);
+        int matches = follow_edge(child->range, matched_characters, suffix, str);
+        matched_characters += matches;
 
         // Check if we can not follow the edge. If not; check sibling.
-        if (!matched_characters) {
+        if (!matches) {
             child = child->sibling;
             continue;
         }
 
-        // If we have matched all characters, so we should explore the child of the current child
-        if (matched_characters == child->range.end) {
+        /*
+         * If we have matched all characters from start to end on an edge,
+         * we should explore the child of the current child
+         */
+        if (matches == child->range.end-child->range.start) {
             place_to_insert = child;
             child = child->child;
             continue;
         }
 
         /*
-         * At this point we know, that we did not match all characters; we should split the edge
+         * At this point forward we know, that we only matched SOME characters; we should split the edge
          */
-
-        // steal the address of the current child which functions as a root in this subtree
-        struct SuffixTreeNode *subtree = child;
-
-        st->st_pool->next++;
-        struct SuffixTreeNode *fst_child = st->st_pool->next;
-        fst_child->range.start = str_len-suffix_len+matched_characters;
-        fst_child->range.end = str_len;
-        fst_child->leaf_label = str_len-suffix_len;
-        fst_child->parent = subtree;
-
-        st->st_pool->next++;
-        struct SuffixTreeNode *snd_child = st->st_pool->next;
-        fst_child->sibling = snd_child;
-
-        snd_child->parent = subtree;
-        snd_child->child = subtree->child;
-        snd_child->leaf_label = subtree->leaf_label;
-        snd_child->range.start = subtree->range.start+matched_characters;
-        snd_child->range.end = subtree->range.end;
-
-        /*
-         * Now as the split has been created, we have to clean up the edge from the
-         * subtree to the subtree parent
-         */
-        subtree->child = fst_child;
-        subtree->range.end = subtree->range.start+matched_characters;
-        subtree->leaf_label = -1;
+        split_edge(st, suffix_len, str_len, child, matched_characters, matches);
 
         return;
     }
@@ -91,7 +98,6 @@ void insert_node(struct SuffixTree *st, char *suffix, int suffix_len, char *str,
     new_node->parent = place_to_insert;
     new_node->sibling = place_to_insert->child;
     place_to_insert->child = new_node;
-
 }
 
 struct SuffixTree *construct_st(char *str) {
@@ -129,8 +135,44 @@ char *range_of_string(struct Range r, char *str) {
     return new_str;
 }
 
-void search(struct SuffixTree st, char *pattern) {
-    //todo
+struct SearchResults *get_leafs(struct SuffixTreeNode *node, struct SearchResults *sr) {
+    if (node == NULL) return sr;
+    // Check if node is a leaf
+    if (node->leaf_label != -1) {
+        //printf("%d ", node->leaf_label+1);
+        sr->position[sr->total_search_results] = node->leaf_label+1;
+        sr->total_search_results++;
+    }
+    get_leafs(node->sibling, sr);
+    get_leafs(node->child, sr);
+}
+
+struct SearchResults *search(struct SuffixTree *st, char *pattern, int pattern_len, char *search_string, int search_string_len) {
+    struct SuffixTreeNode *child = st->root->child;
+    int matched_characters = 0;
+
+    while (child != NULL) {
+        int matches = follow_edge(child->range, matched_characters, pattern, search_string);
+        matched_characters += matches;
+        // can_follow now holds an int of how many characters we took down the edge
+        if (matched_characters == pattern_len) break;
+
+        if (matches) {
+            child = child->child;
+            continue;
+        }
+        child = child->sibling;
+    }
+
+    struct SearchResults *sr = malloc(sizeof *sr);
+    sr->total_search_results = 0;
+    sr->position = malloc(search_string_len*sizeof sr->position);
+    if (matched_characters == pattern_len) {
+        return get_leafs(child, sr);
+    } else {
+        return sr;
+    }
+
 }
 
 
