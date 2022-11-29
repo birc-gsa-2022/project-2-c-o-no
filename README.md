@@ -47,3 +47,8 @@ Worst case input for the construction algorithm is consecutive characters.
 It would take O(n) to search for a place to create a node for the suffix,
 and as we have n suffixes to insert, we end up with O(n^2).
 
+Below is a plot of the running time of suffix tree construction. Time _T_ is in seconds, _n_ goes from 1000 to 250.000 by intervals of 1000 per data point:<br><br><br>
+<img src="/quad.png">
+<br><br>
+Here is the same data, but where the vertical axis has been divided by n^2, to realize that it is indeed running in O(n^2):<br><br><br>
+<img src="/quad2.png">
