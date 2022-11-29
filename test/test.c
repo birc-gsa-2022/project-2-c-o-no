@@ -1128,7 +1128,7 @@ MU_TEST(test_naive_insert_AATACGT_construct) {
     mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->child->sibling->range, str));
     mu_assert_int_eq(0, st->root->child->sibling->child->sibling->leaf_label);
 
-    char *suffix4= "ACGT";
+    char *suffix4 = "ACGT";
     insert_node(st, suffix4, (int) strlen(suffix4), str, (int) strlen(str));
 
     mu_assert_string_eq("TACGT", range_of_string(st->root->child->range, str));
@@ -1142,6 +1142,98 @@ MU_TEST(test_naive_insert_AATACGT_construct) {
     mu_assert_int_eq(1, st->root->child->sibling->child->sibling->leaf_label);
     mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->child->sibling->sibling->range, str));
     mu_assert_int_eq(0, st->root->child->sibling->child->sibling->sibling->leaf_label);
+
+    char *suffix5 = "CGT";
+    insert_node(st, suffix5, (int) strlen(suffix5), str, (int) strlen(str));
+
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(4, st->root->child->leaf_label);
+
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->leaf_label);
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->sibling->child->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->child->sibling->sibling->leaf_label);
+
+    char *suffix6 = "GT";
+    insert_node(st, suffix6, (int) strlen(suffix6), str, (int) strlen(str));
+
+    mu_assert_string_eq("GT", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(5, st->root->child->leaf_label);
+
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->sibling->leaf_label);
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->sibling->sibling->child->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->sibling->sibling->child->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->child->sibling->sibling->leaf_label);
+
+    char *suffix7 = "T";
+    insert_node(st, suffix7, (int) strlen(suffix7), str, (int) strlen(str));
+
+    mu_assert_string_eq("GT", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(5, st->root->child->leaf_label);
+
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("T", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->sibling->child->range, str));
+    mu_assert_int_eq(6, st->root->child->sibling->sibling->child->leaf_label);
+    mu_assert_string_eq("ACGT", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->sibling->leaf_label);
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->sibling->sibling->child->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->sibling->sibling->child->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->child->sibling->sibling->leaf_label);
+
+    char *suffix8 = "";
+    insert_node(st, suffix8, (int) strlen(suffix8), str, (int) strlen(str));
+
+    mu_assert_string_eq("", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(7, st->root->child->leaf_label);
+
+    mu_assert_string_eq("GT", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(5, st->root->child->sibling->leaf_label);
+
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->sibling->range, str));
+    mu_assert_int_eq(4, st->root->child->sibling->sibling->leaf_label);
+
+    mu_assert_string_eq("T", range_of_string(st->root->child->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->sibling->sibling->child->range, str));
+    mu_assert_int_eq(6, st->root->child->sibling->sibling->sibling->child->leaf_label);
+    mu_assert_string_eq("ACGT", range_of_string(st->root->child->sibling->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->sibling->sibling->child->sibling->leaf_label);
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->sibling->sibling->sibling->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->sibling->sibling->sibling->leaf_label);
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->sibling->sibling->sibling->child->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->sibling->sibling->sibling->child->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->sibling->sibling->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->sibling->sibling->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->sibling->sibling->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->sibling->sibling->sibling->child->sibling->sibling->leaf_label);
 
 }
 
