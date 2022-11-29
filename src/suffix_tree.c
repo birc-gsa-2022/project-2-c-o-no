@@ -135,7 +135,7 @@ char *range_of_string(struct Range r, char *str) {
     return new_str;
 }
 
-struct SearchResults *get_leafs(struct SuffixTreeNode *node, struct SearchResults *sr) {
+struct SearchResults *get_leafs(struct SuffixTreeNode *node, struct SearchResults *sr, int first_call) {
     if (node == NULL) return sr;
     // Check if node is a leaf
     if (node->leaf_label != -1) {
@@ -143,8 +143,8 @@ struct SearchResults *get_leafs(struct SuffixTreeNode *node, struct SearchResult
         sr->position[sr->total_search_results] = node->leaf_label+1;
         sr->total_search_results++;
     }
-    get_leafs(node->sibling, sr);
-    get_leafs(node->child, sr);
+    if (!first_call) get_leafs(node->sibling, sr, 0);
+    get_leafs(node->child, sr, 0);
 }
 
 struct SearchResults *search(struct SuffixTree *st, char *pattern, int pattern_len, char *search_string, int search_string_len) {
@@ -168,7 +168,7 @@ struct SearchResults *search(struct SuffixTree *st, char *pattern, int pattern_l
     sr->total_search_results = 0;
     sr->position = malloc(search_string_len*sizeof sr->position);
     if (matched_characters == pattern_len) {
-        return get_leafs(child, sr);
+        return get_leafs(child, sr, 1);
     } else {
         return sr;
     }
