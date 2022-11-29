@@ -97,7 +97,7 @@ MU_TEST(test_naive_insert_ATATAA) {
 
     // Subroutine of construction:
     int n = (int) strlen(str);
-    int num_of_nodes = n == 1 ? 2 : (2*n+1);
+    int num_of_nodes = n == 1 ? 3 : (2*n+1);
     struct SuffixTree *st = malloc(sizeof *st);
     struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
     struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes*sizeof(struct SuffixTreeNode));
@@ -259,7 +259,7 @@ MU_TEST(test_naive_insert_mississippi) {
 
     // Subroutine of construction:
     int n = (int) strlen(str);
-    int num_of_nodes = n == 1 ? 2 : (2*n+1);
+    int num_of_nodes = n == 1 ? 3 : (2*n+1);
     struct SuffixTree *st = malloc(sizeof *st);
     struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
     struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes*sizeof(struct SuffixTreeNode));
@@ -665,7 +665,7 @@ MU_TEST(test_naive_insert_mississippimississippi) {
 
     // Subroutine of construction:
     int n = (int) strlen(str);
-    int num_of_nodes = n == 1 ? 2 : (2 * n + 1);
+    int num_of_nodes = n == 1 ? 3 : (2 * n + 1);
     struct SuffixTree *st = malloc(sizeof *st);
     struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
     struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes * sizeof(struct SuffixTreeNode));
@@ -800,12 +800,144 @@ MU_TEST(test_naive_insert_mississippimississippi) {
     // ....
 }
 
+MU_TEST(test_naive_insert_a_construct) {
+    char *str = "a";
+
+    // Subroutine of construction:
+    int n = (int) strlen(str);
+    int num_of_nodes = n == 1 ? 3 : (2 * n + 1);
+    struct SuffixTree *st = malloc(sizeof *st);
+    struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
+    struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes * sizeof(struct SuffixTreeNode));
+    st_pool->nodes = pool_nodes;
+    st_pool->next = pool_nodes;
+
+    st->st_pool = st_pool;
+    st->root = st->st_pool->next;
+    st->root->range.start = 0;
+    st->root->range.end = 0;
+    st->root->leaf_label = -1;
+    st->root->child = NULL;
+
+    char *suffix1 = "a";
+    insert_node(st, suffix1, (int) strlen(suffix1), str, (int) strlen(str));
+
+    mu_assert_string_eq("a", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(0, st->root->child->leaf_label);
+
+    char *suffix2 = "";
+    insert_node(st, suffix2, (int) strlen(suffix2), str, (int) strlen(str));
+
+    mu_assert_string_eq("", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(1, st->root->child->leaf_label);
+
+    mu_assert_string_eq("a", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->leaf_label);
+}
+
+MU_TEST(test_naive_insert_aaaa_construct) {
+    char *str = "aaaa";
+
+    // Subroutine of construction:
+    int n = (int) strlen(str);
+    int num_of_nodes = n == 1 ? 3 : (2 * n + 1);
+    struct SuffixTree *st = malloc(sizeof *st);
+    struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
+    struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes * sizeof(struct SuffixTreeNode));
+    st_pool->nodes = pool_nodes;
+    st_pool->next = pool_nodes;
+
+    st->st_pool = st_pool;
+    st->root = st->st_pool->next;
+    st->root->range.start = 0;
+    st->root->range.end = 0;
+    st->root->leaf_label = -1;
+    st->root->child = NULL;
+
+    char *suffix1 = "aaaa";
+    insert_node(st, suffix1, (int) strlen(suffix1), str, (int) strlen(str));
+
+    mu_assert_string_eq("aaaa", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(0, st->root->child->leaf_label);
+
+    char *suffix2 = "aaa";
+    insert_node(st, suffix2, (int) strlen(suffix2), str, (int) strlen(str));
+
+    mu_assert_string_eq("aaa", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(1, st->root->child->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->child->sibling->leaf_label);
+
+    char *suffix3 = "aa";
+    insert_node(st, suffix3, (int) strlen(suffix3), str, (int) strlen(str));
+
+    mu_assert_string_eq("aa", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(2, st->root->child->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->child->sibling->child->range, str));
+    mu_assert_int_eq(1, st->root->child->child->sibling->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->child->sibling->child->sibling->leaf_label);
+
+    char *suffix4 = "a";
+    insert_node(st, suffix4, (int) strlen(suffix4), str, (int) strlen(str));
+
+    mu_assert_string_eq("a", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(3, st->root->child->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->child->sibling->child->range, str));
+    mu_assert_int_eq(2, st->root->child->child->sibling->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->child->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(1, st->root->child->child->sibling->child->sibling->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->child->sibling->child->sibling->child->sibling->leaf_label);
+
+    char *suffix5 = "";
+    insert_node(st, suffix5, (int) strlen(suffix5), str, (int) strlen(str));
+
+    mu_assert_string_eq("", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(4, st->root->child->leaf_label);
+
+    mu_assert_string_eq("a", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(2, st->root->child->sibling->child->sibling->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->child->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("", range_of_string(st->root->child->sibling->child->sibling->child->sibling->child->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->sibling->child->sibling->child->leaf_label);
+    mu_assert_string_eq("a", range_of_string(st->root->child->sibling->child->sibling->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->child->sibling->child->sibling->child->sibling->leaf_label);
+
+}
+
+MU_TEST(test_naive_insert_empty_string_construct) {
+    char *str = "";
+    struct SuffixTree *st = construct_st(str);
+
+    mu_assert(st == NULL, "Suffix tree for the empty string expected to be null");
+}
+
 MU_TEST(test_naive_insert_aba_construct) {
     char *str = "aba";
 
     // Subroutine of construction:
     int n = (int) strlen(str);
-    int num_of_nodes = n == 1 ? 2 : (2 * n + 1);
+    int num_of_nodes = n == 1 ? 3 : (2 * n + 1);
     struct SuffixTree *st = malloc(sizeof *st);
     struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
     struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes * sizeof(struct SuffixTreeNode));
@@ -868,7 +1000,7 @@ MU_TEST(test_naive_insert_abba_construct) {
 
     // Subroutine of construction:
     int n = (int) strlen(str);
-    int num_of_nodes = n == 1 ? 2 : (2 * n + 1);
+    int num_of_nodes = n == 1 ? 3 : (2 * n + 1);
     struct SuffixTree *st = malloc(sizeof *st);
     struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
     struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes * sizeof(struct SuffixTreeNode));
@@ -946,6 +1078,90 @@ MU_TEST(test_naive_insert_abba_construct) {
     mu_assert_int_eq(3, st->root->child->sibling->sibling->child->leaf_label);
     mu_assert_string_eq("bba", range_of_string(st->root->child->sibling->sibling->child->sibling->range, str));
     mu_assert_int_eq(0, st->root->child->sibling->sibling->child->sibling->leaf_label);
+}
+
+MU_TEST(test_naive_insert_AATACGT_construct) {
+    char *str = "AATACGT";
+
+    // Subroutine of construction:
+    int n = (int) strlen(str);
+    int num_of_nodes = n == 1 ? 3 : (2 * n + 1);
+    struct SuffixTree *st = malloc(sizeof *st);
+    struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
+    struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes * sizeof(struct SuffixTreeNode));
+    st_pool->nodes = pool_nodes;
+    st_pool->next = pool_nodes;
+
+    st->st_pool = st_pool;
+    st->root = st->st_pool->next;
+    st->root->range.start = 0;
+    st->root->range.end = 0;
+    st->root->leaf_label = -1;
+    st->root->child = NULL;
+
+    char *suffix1 = "AATACGT";
+    insert_node(st, suffix1, (int) strlen(suffix1), str, (int) strlen(str));
+
+    mu_assert_string_eq("AATACGT", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(0, st->root->child->leaf_label);
+
+    char *suffix2 = "ATACGT";
+    insert_node(st, suffix2, (int) strlen(suffix2), str, (int) strlen(str));
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(-1, st->root->child->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->child->range, str));
+    mu_assert_int_eq(1, st->root->child->child->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->child->sibling->leaf_label);
+
+    char *suffix3 = "TACGT";
+    insert_node(st, suffix3, (int) strlen(suffix3), str, (int) strlen(str));
+
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(2, st->root->child->leaf_label);
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->child->sibling->leaf_label);
+
+    char *suffix4= "ACGT";
+    insert_node(st, suffix4, (int) strlen(suffix4), str, (int) strlen(str));
+
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->range, str));
+    mu_assert_int_eq(2, st->root->child->leaf_label);
+
+    mu_assert_string_eq("A", range_of_string(st->root->child->sibling->range, str));
+    mu_assert_int_eq(-1, st->root->child->sibling->leaf_label);
+    mu_assert_string_eq("CGT", range_of_string(st->root->child->sibling->child->range, str));
+    mu_assert_int_eq(3, st->root->child->sibling->child->leaf_label);
+    mu_assert_string_eq("TACGT", range_of_string(st->root->child->sibling->child->sibling->range, str));
+    mu_assert_int_eq(1, st->root->child->sibling->child->sibling->leaf_label);
+    mu_assert_string_eq("ATACGT", range_of_string(st->root->child->sibling->child->sibling->sibling->range, str));
+    mu_assert_int_eq(0, st->root->child->sibling->child->sibling->sibling->leaf_label);
+
+}
+
+MU_TEST(test_naive_insert_a_search1) {
+    char *str = "a";
+    struct SuffixTree *st = construct_st(str);
+    char *pat = "a";
+    struct SearchResults *sr = search(st, pat, (int) strlen(pat), str, (int) strlen(str));
+
+    mu_assert_int_eq(1, sr->total_search_results);
+    mu_assert_int_eq(1, sr->position[0]);
+}
+
+MU_TEST(test_naive_insert_a_search2) {
+    char *str = "a";
+    struct SuffixTree *st = construct_st(str);
+    char *pat = "b";
+    struct SearchResults *sr = search(st, pat, (int) strlen(pat), str, (int) strlen(str));
+
+    mu_assert_int_eq(0, sr->total_search_results);
 }
 
 MU_TEST(test_naive_insert_aba_search1) {
@@ -1058,8 +1274,14 @@ void run_all_tests() {
     MU_RUN_TEST(test_naive_insert_ATATAA);
     MU_RUN_TEST(test_naive_insert_mississippi);
     MU_RUN_TEST(test_naive_insert_mississippimississippi);
+    MU_RUN_TEST(test_naive_insert_a_construct);
+    MU_RUN_TEST(test_naive_insert_aaaa_construct);
+    MU_RUN_TEST(test_naive_insert_empty_string_construct);
     MU_RUN_TEST(test_naive_insert_aba_construct);
     MU_RUN_TEST(test_naive_insert_abba_construct);
+    MU_RUN_TEST(test_naive_insert_AATACGT_construct);
+    MU_RUN_TEST(test_naive_insert_a_search1);
+    MU_RUN_TEST(test_naive_insert_a_search2);
     MU_RUN_TEST(test_naive_insert_aba_search1);
     MU_RUN_TEST(test_naive_insert_aba_search2);
     MU_RUN_TEST(test_naive_insert_abab_search1);

@@ -102,8 +102,10 @@ void insert_node(struct SuffixTree *st, char *suffix, int suffix_len, char *str,
 
 struct SuffixTree *construct_st(char *str) {
     int n = (int) strlen(str);
+    if (n == 0) return NULL;
+
     // Edge case for when n is 1
-    int num_of_nodes = n == 1 ? 2 : (2*n+1);
+    int num_of_nodes = n == 1 ? 3 : (2*n+1);
     struct SuffixTree *st = malloc(sizeof *st);
     struct SuffixTreeNodePool *st_pool = malloc(sizeof *st_pool);
     struct SuffixTreeNode *pool_nodes = malloc(num_of_nodes*sizeof(struct SuffixTreeNode));
