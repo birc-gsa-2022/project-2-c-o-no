@@ -15,17 +15,40 @@ Implement the tool `st` that does exact pattern matching using a suffix tree. Te
 
 ## Specify if you have used a linear time or quadratic time algorithm.
 
+Quadratic time naive insert algorithm. McCreight's algorithm would have been cool, but time, unfortunately, is limited.
+
 ## Insights you may have had while implementing and comparing the algorithms.
+
+N/A
 
 ## Problems encountered if any.
 
+Testing of trees is quite difficult. Initially, a test was made in order to capture the "semantics" of a suffix tree. That is; we do not care about which order nodes
+are in. We only care about who their parent and children are (and their edge labels). This lead to a quite complicated test, which utilized prime factors in order
+to reliably decouple the test from the implementation. The reasoning is, that the test was supposed to be written before the implementation - and would aid in actually
+writing the implementation.
+
+However, even though it worked alright, there were some drawbacks:
+1. It would take too long to write something that tests a lot.
+2. It assumed the tree was already built, so the whole idea of using the test to aid the implementation was lost, as it wouldn't give any insight into where it went wrong.
+
+Thus, other tests were written, which tested each insert of a suffix in the tree. These tests were much more implementation dependant. For instance, it assumed
+that when splitting an edge, the current suffix s which we insert should be the child of the split (s[i:n] where i >= 0). This child would have the previous branch root as a sibling.
+
 ## Correctness
 
-*Describe experiments that verifies the correctness of your implementations.*
+There's about 1400 LOC in test.c. Every insert in the suffix tree is checked to see if everything looks as expected - all verified manually.
+There are also unit tests for searching. We test for no exact matches, one match and multiple matches. 
+The diff is empty between larger files produced from the naive exact search implementation vs. this implementation. 
 
 ## Running time
 
-*Describe experiments that verifies that your implementation of `st` uses no more time than O(n) or O(n²) (depending on the algorithm) for constructing the suffix tree and no more than O(m) for searching for a given read in it. Remember to explain your choice of test data. What are “best” and “worst” case inputs?*
+Worst case input for the construction algorithm is consecutive characters.
+It would take O(n) to search for a place to create a node for the suffix,
+and as we have n suffixes to insert, we end up with O(n^2).
 
-*If you have graphs that show the running time--you probably should have--you can embed them here like we did in the previous project.*
-
+Below is a plot of the running time of suffix tree construction. Time _T_ is in seconds, _n_ goes from 1000 to 250.000 by intervals of 1000 per data point:<br><br><br>
+<img src="/quad.png">
+<br><br>
+Here is the same data, but where the vertical axis has been divided by n^2, to realize that it is indeed running in O(n^2):<br><br><br>
+<img src="/quad2.png">
