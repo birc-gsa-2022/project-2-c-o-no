@@ -129,8 +129,6 @@ struct SuffixTree *construct_st(char *str) {
     return st;
 }
 
-
-// I think range_of_string will only be used in testing?
 char *range_of_string(struct Range r, char *str) {
     int len = r.end-r.start+(r.end-r.start < 0);
     char *new_str = malloc(len+1);
@@ -143,7 +141,6 @@ struct SearchResults *get_leafs(struct SuffixTreeNode *node, struct SearchResult
     if (node == NULL) return sr;
     // Check if node is a leaf
     if (node->leaf_label != -1) {
-        //printf("%d ", node->leaf_label+1);
         sr->position[sr->total_search_results] = node->leaf_label+1;
         sr->total_search_results++;
     }
@@ -158,9 +155,9 @@ struct SearchResults *search(struct SuffixTree *st, char *pattern, int pattern_l
     while (child != NULL) {
         int matches = follow_edge(child->range, matched_characters, pattern, search_string);
         matched_characters += matches;
-        // can_follow now holds an int of how many characters we took down the edge
         if (matched_characters == pattern_len) break;
 
+        // If we matched something, but are not done, we should search the child
         if (matches) {
             child = child->child;
             continue;
