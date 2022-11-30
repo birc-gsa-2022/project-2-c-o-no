@@ -33,7 +33,7 @@ However, even though it worked alright, there were some drawbacks:
 2. It assumed the tree was already built, so the whole idea of using the test to aid the implementation was lost, as it wouldn't give any insight into where it went wrong.
 
 Thus, other tests were written, which tested each insert of a suffix in the tree. These tests were much more implementation dependant. For instance, it assumed
-that when splitting an edge, the current suffix which we insert should be the child of the split. This child would have the previous branch root as a sibling.
+that when splitting an edge, the current suffix s which we insert should be the child of the split (s[i:n] where i >= 0). This child would have the previous branch root as a sibling.
 
 ## Correctness
 
